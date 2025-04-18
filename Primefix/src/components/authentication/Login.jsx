@@ -40,7 +40,7 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       alert("Login successful!");
-      navigate("/TechnicianSidebar"); // ✅ Change route as needed
+      navigate("/Home"); // ✅ Change route as needed
 
     } catch (err) {
       console.error("Login Error:", err);

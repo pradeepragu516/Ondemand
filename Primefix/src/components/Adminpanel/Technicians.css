@@ -7,7 +7,7 @@
     width: calc(100vw - 260px); /* Adjust to avoid sidebar overlap */
     margin-left: 260px; /* Offset the sidebar */
     padding: 10px;
-    background: #f4f4f4;
+    background: #ffffff;
     overflow: hidden; /* Prevent scrolling */
   }
   

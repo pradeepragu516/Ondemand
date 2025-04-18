@@ -23,11 +23,13 @@ import JobDetail from "./components/Technicianpanel/JobDetail";
 import Earnings from "./components/Technicianpanel/Earnings";
 import LiveNavigation from "./components/Technicianpanel/LiveNavigation";
 import Profile from "./components/Technicianpanel/Profile";
-
-
-import "./app.css";
 import TechnicianReportsPage from "./components/Technicianpanel/TechnicianReportsPage";
 import Settings from "./components/Technicianpanel/Settings";
+
+import Home from "./pages/Home";
+import ServiceRequest from "./pages/ServiceRequest";
+import UserLayout from "./UserLayout";
+import "./app.css";
 
 // Admin Panel Layout
 const AdminLayout = () => (
@@ -40,8 +42,6 @@ const AdminLayout = () => (
     </div>
   </div>
 );
-
-
 
 function App() {
   return (
@@ -77,6 +77,13 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="reports" element={<TechnicianReportsPage />} />
           <Route path="settings" element={<Settings />} />
+        </Route>
+
+        {/* User Pages with Navbar & Footer */}
+        <Route element={<UserLayout />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/servicerequest" element={<ServiceRequest />} />
+
         </Route>
       </Routes>
     </Router>

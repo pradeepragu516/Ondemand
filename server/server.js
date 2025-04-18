@@ -11,6 +11,7 @@ const app = express();
 // const earningsRoute = require("./routes/EarningsRoute");
 const technicianRoutes = require('./routes/technicianRoutes');  // Authentication-related routes
 const technicianAdminRoutes = require('./routes/technicianAdminRoutes');  // Admin-related routes
+const appointmentsRoute = require('./routes/appoinment');  // Appointment-related routes
 
 // Models
 const Technician = require('./models/Technician');
@@ -23,7 +24,7 @@ app.use(cors());
 // app.use("/api/earnings", earningsRoute);
 app.use('/api/technician', technicianRoutes);  // Technician registration/login
 app.use('/api/admin/technicians', technicianAdminRoutes);  // Admin managing technician requests
-
+app.use('/api/appointments', appointmentsRoute);  // Appointment booking
 
 
 // ✅ Admin Schema & Model
@@ -66,31 +67,31 @@ mongoose
   });
 
 // ✅ Technician Registration Route
-app.post("/api/technicians/register", async (req, res) => {
-  try {
-    const { name, email, phone, password, skills, experience, address } = req.body;
+// app.post("/api/technicians/register", async (req, res) => {
+//   try {
+//     const { name, email, phone, password, skills, experience, address } = req.body;
 
-    const existingTech = await Technician.findOne({ email });
-    if (existingTech) return res.status(400).json({ error: "Technician already registered" });
+//     const existingTech = await Technician.findOne({ email });
+//     if (existingTech) return res.status(400).json({ error: "Technician already registered" });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newTech = new Technician({
-      name,
-      email,
-      phone,
-      password: hashedPassword,
-      skills,
-      experience,
-      address,
-    });
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const newTech = new Technician({
+//       name,
+//       email,
+//       phone,
+//       password: hashedPassword,
+//       skills,
+//       experience,
+//       address,
+//     });
 
-    await newTech.save();
-    res.status(201).json({ message: "Technician registered, waiting for admin approval." });
-  } catch (err) {
-    console.error("Registration Error:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+//     await newTech.save();
+//     res.status(201).json({ message: "Technician registered, waiting for admin approval." });
+//   } catch (err) {
+//     console.error("Registration Error:", err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
 
 // ✅ Admin Approves Technician
 app.post("/api/technicians/approve", async (req, res) => {

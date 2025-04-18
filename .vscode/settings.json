@@ -4,6 +4,7 @@
         "Adminpanel",
         "technicianlogin",
         "Technicianpanel",
-        "technicianregister"
+        "technicianregister",
+        "Userpanel"
     ]
 }

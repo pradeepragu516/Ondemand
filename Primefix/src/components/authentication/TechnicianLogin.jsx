@@ -1,15 +1,39 @@
 import React, { useState } from "react";
 import "./TechnicianLogin.css";
-import scenery from "../../assets/scenery.jpg"; // Make sure you have a suitable image
+import scenery from "../../assets/scenery.jpg";  // Background image
+import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for page redirection
 
 const TechnicianLogin = () => {
-  const [techId, setTechId] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Logging in with ID:", techId, "Password:", password);
-    // Connect to backend logic here
+
+    try {
+      // Send POST request to backend API
+      const res = await axios.post("http://localhost:4000/api/technician/login", {
+        email,
+        password,
+      });
+
+      // Login success handling
+      alert(res.data.message);  // Success message (can be replaced with toast)
+
+      // Save technician data to localStorage
+      localStorage.setItem("technician", JSON.stringify(res.data.technician));
+
+      // Redirect to Technician Dashboard (change as per your app)
+      navigate("/TechnicianSidebar");  // Navigates to the Dashboard page
+
+    } catch (error) {
+      console.error("Login Error:", error);
+      // Handle login error (show error message)
+      setError(error.response?.data?.error || "Login failed. Please check your credentials.");
+    }
   };
 
   return (
@@ -20,14 +44,17 @@ const TechnicianLogin = () => {
       ></div>
 
       <h2>Technician Login</h2>
+
+      {/* Display error message if any */}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
       <form className="tech-login-form" onSubmit={handleLogin}>
         <input
-          type="text"
-          placeholder="Enter your Technician ID"
-          value={techId}
-          onChange={(e) => setTechId(e.target.value)}
+          type="email"
+          placeholder="Enter your EMAIL ID"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
-          maxLength={6}
         />
         <input
           type="password"

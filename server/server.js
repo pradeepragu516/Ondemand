@@ -5,15 +5,26 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const earningsRoute = require("./routes/EarningsRoute");
-app.use("/api/earnings", earningsRoute);
-
-
 const app = express();
+
+// Routes
+// const earningsRoute = require("./routes/EarningsRoute");
+const technicianRoutes = require('./routes/technicianRoutes');  // Authentication-related routes
+const technicianAdminRoutes = require('./routes/technicianAdminRoutes');  // Admin-related routes
+
+// Models
+const Technician = require('./models/Technician');
 
 // ✅ Middleware
 app.use(express.json());
 app.use(cors());
+
+// ✅ Routes
+// app.use("/api/earnings", earningsRoute);
+app.use('/api/technician', technicianRoutes);  // Technician registration/login
+app.use('/api/admin/technicians', technicianAdminRoutes);  // Admin managing technician requests
+
+
 
 // ✅ Admin Schema & Model
 const AdminSchema = new mongoose.Schema({
@@ -30,22 +41,6 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
 });
 const User = mongoose.model("User", UserSchema);
-
-// ✅ Technician Schema & Model
-const TechnicianSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  phone: String,
-  password: String,
-  skills: String,
-  experience: Number,
-  address: String,
-  status: { type: String, default: "Pending" },
-  verificationCode: String,
-});
-const Technician = mongoose.model("Technician", TechnicianSchema);
-
-
 
 // ✅ MongoDB Connection
 mongoose

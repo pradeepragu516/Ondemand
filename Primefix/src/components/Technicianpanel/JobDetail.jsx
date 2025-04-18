@@ -4,9 +4,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./JobDetail.css";
 
+// ✅ Correct relative path using forward slashes
+import leak1 from "../../assets/leak1.jpg";
+import leak2 from "../../assets/leak2.jpg";
+
 const JobDetail = () => {
   const navigate = useNavigate();
-
   const [status, setStatus] = useState("Pending");
 
   const job = {
@@ -15,7 +18,7 @@ const JobDetail = () => {
     address: "No. 12, 2nd Street, Anna Nagar, Chennai",
     contact: "+91 9876543210",
     issue: "Leaking pipe in the kitchen",
-    images: ["/assets/sample1.jpg", "/assets/sample2.jpg"],
+    images: [leak1, leak2], // ✅ Use imported images
     location: {
       lat: 13.0827,
       lng: 80.2707,
@@ -28,14 +31,13 @@ const JobDetail = () => {
   const handleStatusChange = (e) => {
     const newStatus = e.target.value;
     setStatus(newStatus);
-  
+
     if (newStatus === "Accepted") {
       navigate("/TechnicianSidebar/navigation", {
         state: { task: { ...job, status: newStatus } },
       });
     }
   };
-  
 
   return (
     <div className="job-detail-container">
@@ -51,7 +53,12 @@ const JobDetail = () => {
           <p><strong>Uploaded Images:</strong></p>
           <div className="image-preview">
             {job.images.map((img, index) => (
-              <img key={index} src={img} alt={`issue-${index}`} />
+              <img
+                key={index}
+                src={img}
+                alt={`issue-${index}`}
+                style={{ width: "200px", height: "auto", marginRight: "10px", borderRadius: "10px" }}
+              />
             ))}
           </div>
         </div>
@@ -60,6 +67,7 @@ const JobDetail = () => {
           <label htmlFor="status">Update Status:</label>
           <select id="status" value={status} onChange={handleStatusChange}>
             <option value="Pending">Pending</option>
+            <option value="rejected">Rejected</option>
             <option value="Accepted">Accepted</option>
             <option value="On the Way">On the Way</option>
             <option value="In Progress">In Progress</option>

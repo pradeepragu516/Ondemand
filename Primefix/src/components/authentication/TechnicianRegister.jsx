@@ -19,11 +19,13 @@ const TechnicianRegister = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value.trimStart() }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccessMessage("");
@@ -31,7 +33,7 @@ const TechnicianRegister = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:4000/api/technicians/register", {
+      const response = await fetch("http://localhost:4000/api/technician/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -95,9 +97,8 @@ const TechnicianRegister = () => {
           onChange={handleChange}
         />
 
-        {/* ✅ Password Field */}
+        {/* Password Field */}
         <div className="input-group1">
-          {/* <label htmlFor="password">Password</label> */}
           <div className="password-input1">
             <input
               id="password"
@@ -108,11 +109,9 @@ const TechnicianRegister = () => {
               onChange={handleChange}
               required
             />
-            <div className="one">
             <span onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
-            </div>
           </div>
         </div>
 

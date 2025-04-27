@@ -10,31 +10,27 @@ const TechnicianLogin = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+const handleLogin = async (e) => {
+  e.preventDefault();
 
-    try {
-      // Send POST request to backend API
-      const res = await axios.post("http://localhost:4000/api/technician/login", {
-        email,
-        password,
-      });
+  try {
+    const res = await axios.post("http://localhost:4000/api/technician/login", {
+      email,
+      password,
+    });
 
-      // Login success handling
-      alert(res.data.message);  // Success message (can be replaced with toast)
+    alert(res.data.message);
 
-      // Save technician data to localStorage
-      localStorage.setItem("technician", JSON.stringify(res.data.technician));
+    localStorage.setItem("technician", JSON.stringify(res.data.technician));
+    localStorage.setItem("technicianId", res.data.technician._id);  // ✅ Save ID separately
 
-      // Redirect to Technician Dashboard (change as per your app)
-      navigate("/TechnicianSidebar");  // Navigates to the Dashboard page
+    navigate("/TechnicianSidebar");
+  } catch (error) {
+    console.error("Login Error:", error);
+    setError(error.response?.data?.error || "Login failed. Please check your credentials.");
+  }
+};
 
-    } catch (error) {
-      console.error("Login Error:", error);
-      // Handle login error (show error message)
-      setError(error.response?.data?.error || "Login failed. Please check your credentials.");
-    }
-  };
 
   return (
     <div className="tech-login-container">

@@ -1,5 +1,3 @@
-// src/components/technicianpanel/Earnings.jsx
-
 import React, { useState, useEffect } from "react";
 import "./Earnings.css";
 import axios from "axios";
@@ -13,10 +11,6 @@ import {
   CartesianGrid,
 } from "recharts";
 
-// TODO: Replace this with actual logged-in technician ID from context or auth
-const TECHNICIAN_ID = 55643256632;
-
-// Backend base URL (update if you deploy to production)
 const BACKEND_URL = "http://localhost:4000";
 
 const Earnings = () => {
@@ -27,13 +21,20 @@ const Earnings = () => {
     date: "",
   });
 
-  useEffect(() => {
-    fetchJobHistory();
-  }, []);
+  const technician = JSON.parse(localStorage.getItem("technician"));
+  const technicianId = technician?.id || technician?._id;
 
-  const fetchJobHistory = async () => {
+  useEffect(() => {
+    if (technicianId) {
+      fetchJobHistory(technicianId);
+    } else {
+      console.error("Technician ID not found in localStorage.");
+    }
+  }, [technicianId]);
+
+  const fetchJobHistory = async (id) => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/api/earnings/history/${TECHNICIAN_ID}`);
+      const res = await axios.get(`${BACKEND_URL}/api/earnings/history/${id}`);
       const jobs = res.data.map((job, index) => ({
         id: index + 1,
         job: job.job,
@@ -54,10 +55,10 @@ const Earnings = () => {
   const handleAddJob = async () => {
     const { job, amount, date } = jobInput;
 
-    if (job && amount && date) {
+    if (job && amount && date && technicianId) {
       try {
         const response = await axios.post(`${BACKEND_URL}/api/earnings/add`, {
-          technicianId: TECHNICIAN_ID,
+          technicianId,
           job,
           amount: parseInt(amount),
           date,

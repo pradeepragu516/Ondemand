@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Appointment = require('../models/appoinment');
+const Appointment = require('../models/appointment');
+const AssignedJob = require('../models/jobAssignment'); // Assuming you have this model
 // POST /api/appointments
 router.post('/', async (req, res) => {
     try {

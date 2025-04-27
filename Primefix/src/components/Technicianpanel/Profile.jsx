@@ -2,69 +2,77 @@ import React, { useState, useEffect } from "react";
 import "./Profile.css";
 import { Pencil, ToggleLeft, ToggleRight } from "lucide-react";
 import axios from "axios";
-import technicianImg from "../../assets/technician.jpg";
-// import placeholderImg from "../../assets/placeholder.jpg"; // fallback image
+import defaultImg from "../../assets/technician.jpg";
 
 const Profile = () => {
-  const [availability, setAvailability] = useState("Available");
-  const [showEditModal, setShowEditModal] = useState(false);
   const [technician, setTechnician] = useState(null);
-  const [editedTech, setEditedTech] = useState({});
+  const [editedTechnician, setEditedTechnician] = useState({});
+  const [availability, setAvailability] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
 
-  const technicianId = "YOUR_TECHNICIAN_ID_HERE"; // Replace this with actual ID from login/session
-
-  // Fetch technician profile
   useEffect(() => {
-    const fetchTechnician = async () => {
+    const fetchOrCreateTechnician = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/api/profile/${technicianId}`);
-        setTechnician(res.data);
-        setEditedTech(res.data);
+        const res = await axios.post("http://localhost:4000/api/profile/createOrFetch");
+        const data = res.data;
+        setTechnician(data);
+        setEditedTechnician(data);
+        setAvailability(data.availability || "Available");
       } catch (error) {
-        console.error("Error fetching technician data", error);
+        console.error("Error fetching/creating technician:", error);
       }
     };
 
-    fetchTechnician();
-  }, [technicianId]);
+    fetchOrCreateTechnician();
+  }, []);
 
-  const toggleAvailability = () => {
-    const newAvailability = availability === "Available" ? "Unavailable" : "Available";
-    setAvailability(newAvailability);
-    setEditedTech((prev) => ({ ...prev, availability: newAvailability }));
+  const toggleAvailability = async () => {
+    const newStatus = availability === "Available" ? "Unavailable" : "Available";
+    setAvailability(newStatus);
+
+    try {
+      const res = await axios.put(`http://localhost:4000/api/profile/${technician._id}`, {
+        ...technician,
+        availability: newStatus,
+      });
+      setTechnician(res.data);
+    } catch (error) {
+      console.error("Error updating availability:", error);
+    }
   };
 
   const handleEditChange = (field, value) => {
-    setEditedTech((prev) => ({ ...prev, [field]: value }));
+    setEditedTechnician((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleEditSkillChange = (index, value) => {
-    const updatedSkills = [...editedTech.skills];
+    const updatedSkills = [...editedTechnician.skills];
     updatedSkills[index] = value;
-    setEditedTech((prev) => ({ ...prev, skills: updatedSkills }));
+    setEditedTechnician((prev) => ({ ...prev, skills: updatedSkills }));
   };
 
   const handleAddSkill = () => {
-    setEditedTech((prev) => ({ ...prev, skills: [...prev.skills, ""] }));
+    setEditedTechnician((prev) => ({ ...prev, skills: [...(prev.skills || []), ""] }));
   };
 
   const handleRemoveSkill = (index) => {
-    const updatedSkills = [...editedTech.skills];
+    const updatedSkills = [...editedTechnician.skills];
     updatedSkills.splice(index, 1);
-    setEditedTech((prev) => ({ ...prev, skills: updatedSkills }));
+    setEditedTechnician((prev) => ({ ...prev, skills: updatedSkills }));
   };
 
   const handleSave = async () => {
     try {
-      const res = await axios.put(`http://localhost:4000/api/profile/${technicianId}`, editedTech);
+      const res = await axios.put(`http://localhost:4000/api/profile/${technician._id}`, editedTechnician);
       setTechnician(res.data);
+      setAvailability(res.data.availability);
       setShowEditModal(false);
     } catch (error) {
-      console.error("Error updating profile", error);
+      console.error("Error saving profile:", error);
     }
   };
 
-  if (!technician) return <div>Loading technician data...</div>;
+  if (!technician) return <div>Loading technician profile...</div>;
 
   return (
     <div className="profile-container">
@@ -73,15 +81,12 @@ const Profile = () => {
       <div className="profile-card">
         <div className="profile-left">
           <img
-            src={technician.profileImg || technicianImg}
+            src={technician.profileImg || defaultImg}
             alt="Technician"
             className="profile-img"
-            onError={(e) => (e.target.src = technicianImg)}
+            onError={(e) => (e.target.src = defaultImg)}
           />
-
-          <span className={`status-tag ${availability.toLowerCase()}`}>
-            {availability}
-          </span>
+          <span className={`status-tag ${availability.toLowerCase()}`}>{availability}</span>
 
           <button className="toggle-btn" onClick={toggleAvailability}>
             {availability === "Available" ? (
@@ -99,10 +104,7 @@ const Profile = () => {
         <div className="profile-right">
           <div className="profile-header">
             <h3>{technician.name}</h3>
-            <button className="edit-btn" onClick={() => {
-              setEditedTech(technician); // reset edits
-              setShowEditModal(true);
-            }}>
+            <button className="edit-btn" onClick={() => setShowEditModal(true)}>
               <Pencil size={16} /> Edit Profile
             </button>
           </div>
@@ -123,49 +125,48 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
       {showEditModal && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h3>Edit Profile</h3>
+            <h3>Edit Technician Profile</h3>
 
             <label>Name:</label>
             <input
               type="text"
-              value={editedTech.name || ""}
+              value={editedTechnician.name || ""}
               onChange={(e) => handleEditChange("name", e.target.value)}
             />
 
             <label>Email:</label>
             <input
               type="email"
-              value={editedTech.email || ""}
+              value={editedTechnician.email || ""}
               onChange={(e) => handleEditChange("email", e.target.value)}
             />
 
             <label>Phone:</label>
             <input
               type="text"
-              value={editedTech.phone || ""}
+              value={editedTechnician.phone || ""}
               onChange={(e) => handleEditChange("phone", e.target.value)}
             />
 
             <label>Address:</label>
             <input
               type="text"
-              value={editedTech.address || ""}
+              value={editedTechnician.address || ""}
               onChange={(e) => handleEditChange("address", e.target.value)}
             />
 
             <label>ID Proof:</label>
             <input
               type="text"
-              value={editedTech.idProof || ""}
+              value={editedTechnician.idProof || ""}
               onChange={(e) => handleEditChange("idProof", e.target.value)}
             />
 
             <label>Skills:</label>
-            {editedTech.skills?.map((skill, index) => (
+            {editedTechnician.skills?.map((skill, index) => (
               <div key={index} className="skill-edit-row">
                 <input
                   type="text"

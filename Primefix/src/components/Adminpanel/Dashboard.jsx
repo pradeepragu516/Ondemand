@@ -6,11 +6,11 @@ import "./Dashboard.css";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
-    totalRequests: 0,
-    completedRequests: 0,
-    activeTechnicians: 0,
-    totalUsers: 0,
-    totalRevenue: 0,
+    totalRequests: 10,
+    completedRequests: 5,
+    activeTechnicians: 6,
+    totalUsers: 10,
+    totalRevenue: 120000,
   });
 
   useEffect(() => {

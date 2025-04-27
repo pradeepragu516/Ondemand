@@ -11,11 +11,14 @@ const app = express();
 // const earningsRoute = require("./routes/EarningsRoute");
 const technicianRoutes = require('./routes/technicianRoutes');  // Authentication-related routes
 const technicianAdminRoutes = require('./routes/technicianAdminRoutes');  // Admin-related routes
-const appointmentsRoute = require('./routes/appoinment');  // Appointment-related routes
-
+const appointments = require('./routes/appointmentRoute');  // Appointment-related routes
+const earningsRoute = require('./routes/earnings');  // Earnings-related routes
+const profileRoute = require('./routes/profile');  // Profile-related routes
+const appointmentsRoute = require('./routes/adminServiceRequests');  // Admin service request-related routes
+const serviceRequestsRoutes = require('./routes/serviceRequest');  // Service request-related routes
 // Models
 const Technician = require('./models/Technician');
-
+const User = require('./models/User'); 
 // ✅ Middleware
 app.use(express.json());
 app.use(cors());
@@ -24,8 +27,11 @@ app.use(cors());
 // app.use("/api/earnings", earningsRoute);
 app.use('/api/technician', technicianRoutes);  // Technician registration/login
 app.use('/api/admin/technicians', technicianAdminRoutes);  // Admin managing technician requests
-app.use('/api/appointments', appointmentsRoute);  // Appointment booking
-
+app.use('/api/appointments', appointments);  // Appointment booking
+app.use('/api/earnings', earningsRoute);  // Earnings management
+app.use('/api/profile', profileRoute);  // Profile management
+app.use('/api/serviceRequests', appointmentsRoute); 
+app.use('/api/serviceRequests', serviceRequestsRoutes)  // Admin service request management
 
 // ✅ Admin Schema & Model
 const AdminSchema = new mongoose.Schema({
@@ -41,7 +47,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
 });
-const User = mongoose.model("User", UserSchema);
+
 
 // ✅ MongoDB Connection
 mongoose
@@ -202,6 +208,43 @@ app.post("/api/login", async (req, res) => {
   } catch (error) {
     console.error("❌ User Login Error:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/api/technicians/approved", async (req, res) => {
+  try {
+    const approvedTechnicians = await Technician.find()
+    
+    res.json(approvedTechnicians);
+  } catch (err) {
+    console.error("❌ Fetch Ap  proved Technicians Error:", err);
+    res.status(500).json({ error: "Server error while fetching approved technicians" });
+  }
+});
+app.get('/api/serviceRequests', async (req, res) => {
+  try {
+    const serviceRequests = await serviceRequests.find(); // Or whatever query you're using
+    res.json({ appointments: serviceRequests });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching service requests.' });
+  }
+});
+
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find();  // fetch all users
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+app.get('/api/technicians/:technicianId/jobs', async (req, res) => {
+  try {
+    const jobs = await ServiceRequest.find({ technician: req.params.technicianId });
+    res.json(jobs);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch jobs' });
   }
 });
 
